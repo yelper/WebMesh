@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Sample three.js file (sandbox)</title>
+    <style type="text/css">
+        #container { 
+            background: #000;
+            width: 800px;
+            height: 800px;
+        }
+    </style>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="js/third-party/three.min.js" type="text/javascript"></script>
+    <script src="js/third-party/OBJLoader.js" type="text/javascript"></script>
+</head>
+<body>
+    
+    <div id="container"></div>    
+
+    <script type="text/javascript">
+    
+        var container;
+        var camera, scene, renderer;
+        
+        init();
+        animate();
+    
+        function init() {
+            var width = 800, height = 800;
+            camera = new THREE.PerspectiveCamera(45, width / height, 1, 2000);
+            camera.position.z = 100;
+            
+            scene = new THREE.Scene();
+            var ambient = new THREE.AmbientLight(0x101030);
+            scene.add(ambient);
+            
+            var ptLight = new THREE.PointLight(0xFFFFFF);
+            ptLight.position.x = 10;
+            ptLight.position.y = 50;
+            ptLight.position.z = 130;
+            scene.add(ptLight);
+            
+            // load the script
+            var manager = new THREE.LoadingManager();
+            manager.onProgress = function(item, loaded, total) {
+                console.log(item, loaded, total);
+            };
+            
+            var loader = new THREE.OBJLoader(manager);
+            loader.load("obj/decal-3ICB_00_0_A.face.obj", function(object) {
+                object.position.z = 0;
+                scene.add(object);
+            });
+            
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(width, height);
+            
+            var $container = $("#container");
+            $container.append(renderer.domElement);
+        }        
+        
+        function animate() {
+            requestAnimationFrame(animate);
+            render();
+        }
+        
+        function render() {
+            renderer.render(scene, camera);
+        }
+        
+    </script>
+    
+    
+    <!--<script type="text/javascript">
+        var width = 600, height = 600;
+        var view_angle = 45, aspect = width/height, near = 0.1, far = 10000;
+        
+        var $container = $("#container");
+        var renderer = new THREE.WebGLRenderer();
+        var camera = new THREE.PerspectiveCamera(view_angle, aspect, near, far);
+        var scene = new THREE.Scene();
+        
+        camera.position.z = 300;
+        renderer.setSize(width, height);
+        $container.append(renderer.domElement);
+        
+        var mat = new THREE.MeshLambertMaterial({color: 0xCC0000});
+        var radius = 50, segments = 16, rings = 16;
+        var sphere = new THREE.Mesh(new THREE.SphereGeometry(radius, segments, rings), mat);
+        scene.add(sphere);
+        scene.add(camera);
+        
+        var ptLight = new THREE.PointLight(0xFFFFFF);
+        ptLight.position.x = 10;
+        ptLight.position.y = 50;
+        ptLight.position.z = 130;
+        scene.add(ptLight);
+        
+        var render = function() { 
+            requestAnimationFrame(render);
+            renderer.render(scene, camera);
+        }
+            
+        render();
+    </script>-->
+
+</body>
+</html>

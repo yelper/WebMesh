@@ -16,7 +16,35 @@
 </head>
 <body>
     
-    <div id="container"></div>    
+    <div id="container"></div>
+
+    <script type="text/x-vertex" id="vertshader">
+        varying vec4 pos;
+        varying vec3 v_normal;
+
+        void main() {
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0);
+            pos = vec4(position,1.0);
+            v_normal = normal;
+
+        }
+    </script>    
+    
+    <script type="text/x-fragment" id="fragshader">
+        varying vec4 pos;
+        varying vec3 v_normal;
+
+        void main() {
+            vec4 lpos = vec4(10,50,130,1);
+            vec4 s = normalize(lpos - pos);
+            vec3 n = normalize(v_normal);
+
+            float attenuation = abs(dot(n, s.xyz)) * float(vec3(1.0,1.0,1.0));
+            gl_FragColor = vec4(1.0,1.0,1.0,1.0) * attenuation;
+
+            // gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);
+        }
+    </script>
 
     <script type="text/javascript">
     
@@ -47,9 +75,23 @@
                 console.log(item, loaded, total);
             };
             
+            // var shaderMaterial = null;
+            
             var loader = new THREE.OBJLoader(manager);
             loader.load("obj/decal-3ICB_00_0_A.face.obj", function(object) {
+            //loader.load("obj/capsule.obj", function(object) {
                 object.position.z = 0;
+                
+                // add the material to any meshes in here
+                object.traverse(function(child) {
+                    if (child instanceof THREE.Mesh) {
+	                child.material = new THREE.ShaderMaterial({
+                                            vertexShader: $("#vertshader").text(),
+                                            fragmentShader: $("#fragshader").text()
+                                        });
+                    }
+                });
+                
                 scene.add(object);
             });
             

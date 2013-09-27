@@ -13,6 +13,7 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
     <script src="js/third-party/three.min.js" type="text/javascript"></script>
     <script src="js/third-party/OBJLoader.js" type="text/javascript"></script>
+    <script src="js/third-party/OrbitControls.js" type="text/javascript"></script>
 </head>
 <body>
     
@@ -40,9 +41,8 @@
             vec3 n = normalize(v_normal);
 
             float attenuation = abs(dot(n, s.xyz)) * float(vec3(1.0,1.0,1.0));
+            //float attenuation = 1.0 - pow( clamp( acos( n.z ) / 1.57079633, 0.0, .95), 0.3 * 20.0 );
             gl_FragColor = vec4(1.0,1.0,1.0,1.0) * attenuation;
-
-            // gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);
         }
     </script>
 
@@ -50,6 +50,7 @@
     
         var container;
         var camera, scene, renderer;
+        var controls;
         
         init();
         animate();
@@ -58,6 +59,9 @@
             var width = 800, height = 800;
             camera = new THREE.PerspectiveCamera(45, width / height, 1, 2000);
             camera.position.z = 100;
+            
+            controls = new THREE.OrbitControls(camera);
+            controls.addEventListener('change', render);
             
             scene = new THREE.Scene();
             var ambient = new THREE.AmbientLight(0x101030);
@@ -104,6 +108,7 @@
         
         function animate() {
             requestAnimationFrame(animate);
+            controls.update();
             render();
         }
         
